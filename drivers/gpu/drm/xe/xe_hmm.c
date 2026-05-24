@@ -3,6 +3,24 @@
  * Copyright © 2024 Intel Corporation
  */
 
+#include "xe_hmm.h"
+
+#include <linux/errno.h>
+
+#ifdef __FreeBSD__
+
+int xe_hmm_userptr_populate_range(struct xe_userptr_vma *uvma,
+				  bool is_mm_mmap_locked)
+{
+	return -ENOSYS;
+}
+
+void xe_hmm_userptr_free_sg(struct xe_userptr_vma *uvma)
+{
+}
+
+#else /* __FreeBSD__ */
+
 #include <linux/scatterlist.h>
 #include <linux/mmu_notifier.h>
 #include <linux/dma-mapping.h>
@@ -10,7 +28,6 @@
 #include <linux/swap.h>
 #include <linux/hmm.h>
 #include <linux/mm.h>
-#include "xe_hmm.h"
 #include "xe_vm.h"
 #include "xe_bo.h"
 
@@ -251,3 +268,4 @@ free_pfns:
 	return ret;
 }
 
+#endif /* __FreeBSD__ */

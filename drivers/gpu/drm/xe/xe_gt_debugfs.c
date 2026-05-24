@@ -74,7 +74,11 @@ int xe_gt_debugfs_simple_show(struct seq_file *m, void *data)
 {
 	struct drm_printer p = drm_seq_file_printer(m);
 	struct drm_info_node *node = m->private;
+#ifdef __linux__
 	struct dentry *parent = node->dent->d_parent;
+#elif defined(__FreeBSD__)
+	struct dentry *parent = node->dent;
+#endif
 	struct xe_gt *gt = parent->d_inode->i_private;
 	int (*print)(struct xe_gt *, struct drm_printer *) = node->info_ent->data;
 
