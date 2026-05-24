@@ -22,6 +22,32 @@ str_yes_no(bool v)
 }
 
 static inline const char *
+str_on_off(bool v)
+{
+	return (v ? "on" : "off");
+}
+
+static inline const char *
+str_enabled_disabled(bool v)
+{
+	return (v ? "enabled" : "disabled");
+}
+
+static inline const char *
+str_enable_disable(bool v)
+{
+	return (v ? "enable" : "disable");
+}
+
+#define	str_disable_enable(_v)		str_enable_disable(!(_v))
+
+static inline const char *
+str_read_write(bool v)
+{
+	return (v ? "read" : "write");
+}
+
+static inline const char *
 str_plural(unsigned long n)
 {
 	return (n == 1 ? "" : "s");

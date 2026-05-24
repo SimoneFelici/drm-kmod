@@ -11,6 +11,8 @@ WA_H=	${GENDIR}/xe_wa_oob.h
 	${SRCDIR}/regs \
 	${SRCDIR}/instructions \
 	${SRCDIR}/display \
+	${SRCDIR}/display/ext \
+	${.CURDIR:H}/drivers/gpu/drm/i915/display \
 	${GENDIR}
 
 .PATH: ${.CURDIR:H}/drivers/gpu/drm/ttm
@@ -119,7 +121,101 @@ SRCS=	\
 	xe_wopcm.c
 
 .if ${KCONFIG:MDRM_XE_DISPLAY} != ""
-SRCS+=	xe_display.c
+SRCS+= \
+	i915_irq.c \
+	i915_utils.c \
+	intel_fb_bo.c \
+	intel_fbdev_fb.c \
+	xe_display.c \
+	xe_display_misc.c \
+	xe_display_rps.c \
+	xe_display_wa.c \
+	xe_dsb_buffer.c \
+	xe_fb_pin.c \
+	xe_hdcp_gsc.c \
+	xe_plane_initial.c \
+	xe_tdf.c \
+	icl_dsi.c \
+	intel_acpi.c \
+	intel_alpm.c \
+	intel_atomic.c \
+	intel_atomic_plane.c \
+	intel_audio.c \
+	intel_backlight.c \
+	intel_bios.c \
+	intel_bw.c \
+	intel_cdclk.c \
+	intel_color.c \
+	intel_combo_phy.c \
+	intel_connector.c \
+	intel_crtc.c \
+	intel_crtc_state_dump.c \
+	intel_cursor.c \
+	intel_cx0_phy.c \
+	intel_ddi.c \
+	intel_ddi_buf_trans.c \
+	intel_display.c \
+	intel_display_device.c \
+	intel_display_driver.c \
+	intel_display_irq.c \
+	intel_display_params.c \
+	intel_display_power.c \
+	intel_display_power_map.c \
+	intel_display_power_well.c \
+	intel_display_wa.c \
+	intel_dkl_phy.c \
+	intel_dmc.c \
+	intel_dp.c \
+	intel_dp_aux.c \
+	intel_dp_aux_backlight.c \
+	intel_dp_hdcp.c \
+	intel_dp_link_training.c \
+	intel_dp_mst.c \
+	intel_dpll.c \
+	intel_dpll_mgr.c \
+	intel_dpt_common.c \
+	intel_drrs.c \
+	intel_dsb.c \
+	intel_dsi.c \
+	intel_dsi_dcs_backlight.c \
+	intel_dsi_vbt.c \
+	intel_encoder.c \
+	intel_fb.c \
+	intel_fbc.c \
+	intel_fdi.c \
+	intel_fifo_underrun.c \
+	intel_frontbuffer.c \
+	intel_global_state.c \
+	intel_gmbus.c \
+	intel_hdcp.c \
+	intel_hdcp_gsc_message.c \
+	intel_hdmi.c \
+	intel_hotplug.c \
+	intel_hotplug_irq.c \
+	intel_hti.c \
+	intel_link_bw.c \
+	intel_lspcon.c \
+	intel_modeset_lock.c \
+	intel_modeset_setup.c \
+	intel_modeset_verify.c \
+	intel_opregion.c \
+	intel_panel.c \
+	intel_pmdemand.c \
+	intel_pps.c \
+	intel_psr.c \
+	intel_qp_tables.c \
+	intel_quirks.c \
+	intel_snps_phy.c \
+	intel_tc.c \
+	intel_vblank.c \
+	intel_vdsc.c \
+	intel_vga.c \
+	intel_vrr.c \
+	intel_dmc_wl.c \
+	intel_wm.c \
+	skl_scaler.c \
+	skl_universal_plane.c \
+	skl_watermark.c
 .endif
 
 # SR-IOV VF pieces are unconditionally included by Linux xe-y.
@@ -188,6 +284,10 @@ CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= -I${SRCDIR}
 CFLAGS+= -I${SRCDIR}/compat-i915-headers
 CFLAGS+= -I${SRCDIR}/display
+CFLAGS+= -I${SRCDIR}/display/ext
+CFLAGS+= -I${.CURDIR:H}/drivers/gpu/drm/i915/display
+CFLAGS+= -Ddrm_i915_gem_object=xe_bo
+CFLAGS+= -Ddrm_i915_private=xe_device
 CFLAGS+= -I${SRCDIR}/regs
 CFLAGS+= -I${SRCDIR}/instructions
 CFLAGS+= -I${.CURDIR}
@@ -215,6 +315,7 @@ CFLAGS+= -include linux/mm.h
 CFLAGS+= -include linux/anon_inodes.h
 CFLAGS+= -include linux/idr.h
 CFLAGS+= -include linux/align.h
+CFLAGS+= -include linux/acpi.h
 CFLAGS+= -include linux/kunit.h
 CFLAGS+= -include linux/kthread.h
 CFLAGS+= -include linux/ioport.h

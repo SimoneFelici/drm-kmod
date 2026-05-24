@@ -63,6 +63,7 @@
 /* No good place to put it (manu 20200522) */
 SYSCTL_DECL(_hw_dri);
 SYSCTL_DECL(_dev_drm);
+SYSCTL_DECL(_hw_xe);
 
 #define	LINUXKPI_PARAM_bool(name, var, perm)				\
 	extern const char LINUXKPI_PARAM_DESC(name)[];			\

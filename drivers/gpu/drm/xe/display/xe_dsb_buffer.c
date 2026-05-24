@@ -15,11 +15,11 @@ u32 intel_dsb_buffer_ggtt_offset(struct intel_dsb_buffer *dsb_buf)
 	return xe_bo_ggtt_addr(dsb_buf->vma->bo);
 }
 
-void intel_dsb_buffer_write(struct intel_dsb_buffer *dsb_buf, u32 idx, u32 val)
+void intel_dsb_buffer_write(struct intel_dsb_buffer *dsb_buf, u32 idx, u32 value)
 {
 	struct xe_device *xe = dsb_buf->vma->bo->tile->xe;
 
-	iosys_map_wr(&dsb_buf->vma->bo->vmap, idx * 4, u32, val);
+	iosys_map_wr(&dsb_buf->vma->bo->vmap, idx * 4, u32, value);
 	xe_device_l2_flush(xe);
 }
 
