@@ -18,7 +18,11 @@
 
 static inline struct drm_i915_private *to_i915(const struct drm_device *dev)
 {
+#ifdef __FreeBSD__
+	return (struct drm_i915_private *)container_of(dev, struct xe_device, drm);
+#else
 	return container_of(dev, struct drm_i915_private, drm);
+#endif
 }
 
 #define IS_PLATFORM(xe, x) ((xe)->info.platform == x)

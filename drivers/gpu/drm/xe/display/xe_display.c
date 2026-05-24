@@ -30,11 +30,26 @@
 #include "intel_opregion.h"
 #include "xe_module.h"
 
+#ifdef __FreeBSD__
+#ifndef ACPI_STATE_S3
+#define ACPI_STATE_S3 3
+#endif
+static inline int acpi_target_system_state(void)
+{
+	return ACPI_STATE_S3;
+}
+#endif
+
+
 /* Xe device functions */
 
 static bool has_display(struct xe_device *xe)
 {
+#ifdef __FreeBSD__
+	return xe->info.probe_display;
+#else
 	return HAS_DISPLAY(xe);
+#endif
 }
 
 /**
