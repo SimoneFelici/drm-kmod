@@ -10,7 +10,7 @@ struct drm_i915_private;
 struct intel_connector;
 struct intel_crtc;
 
-#ifdef CONFIG_DEBUG_FS
+#if defined(CONFIG_DEBUG_FS) && !defined(__FreeBSD__)
 void intel_display_debugfs_register(struct drm_i915_private *i915);
 void intel_connector_debugfs_add(struct intel_connector *connector);
 void intel_crtc_debugfs_add(struct intel_crtc *crtc);

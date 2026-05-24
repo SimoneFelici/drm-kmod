@@ -13,6 +13,8 @@ WA_H=	${GENDIR}/xe_wa_oob.h
 	${SRCDIR}/display \
 	${SRCDIR}/display/ext \
 	${.CURDIR:H}/drivers/gpu/drm/i915/display \
+	${.CURDIR:H}/drivers/gpu/drm/i915/soc \
+	${.CURDIR:H}/drivers/video \
 	${GENDIR}
 
 .PATH: ${.CURDIR:H}/drivers/gpu/drm/ttm
@@ -150,6 +152,7 @@ SRCS+= \
 	intel_connector.c \
 	intel_crtc.c \
 	intel_crtc_state_dump.c \
+	hdmi.c \
 	intel_cursor.c \
 	intel_cx0_phy.c \
 	intel_ddi.c \
@@ -200,6 +203,7 @@ SRCS+= \
 	intel_modeset_verify.c \
 	intel_opregion.c \
 	intel_panel.c \
+	intel_pch.c \
 	intel_pmdemand.c \
 	intel_pps.c \
 	intel_psr.c \
@@ -212,6 +216,7 @@ SRCS+= \
 	intel_vga.c \
 	intel_vrr.c \
 	intel_dmc_wl.c \
+	intel_dram.c \
 	intel_wm.c \
 	skl_scaler.c \
 	skl_universal_plane.c \
@@ -286,6 +291,7 @@ CFLAGS+= -I${SRCDIR}/compat-i915-headers
 CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/ext
 CFLAGS+= -I${.CURDIR:H}/drivers/gpu/drm/i915/display
+CFLAGS+= -I${.CURDIR:H}/drivers/gpu/drm/i915/soc
 CFLAGS+= -Ddrm_i915_gem_object=xe_bo
 CFLAGS+= -Ddrm_i915_private=xe_device
 CFLAGS+= -I${SRCDIR}/regs

@@ -12,7 +12,7 @@ struct drm_crtc;
 struct drm_i915_private;
 struct intel_crtc;
 
-#ifdef CONFIG_DEBUG_FS
+#if defined(CONFIG_DEBUG_FS) && !defined(__FreeBSD__)
 void intel_crtc_crc_init(struct intel_crtc *crtc);
 int intel_crtc_set_crc_source(struct drm_crtc *crtc, const char *source_name);
 int intel_crtc_verify_crc_source(struct drm_crtc *crtc,
