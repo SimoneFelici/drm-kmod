@@ -25,6 +25,7 @@ struct xe_modparam xe_modparam = {
 	/* the rest are 0 by default */
 };
 
+#ifdef __linux__
 module_param_named_unsafe(force_execlist, xe_modparam.force_execlist, bool, 0444);
 MODULE_PARM_DESC(force_execlist, "Force Execlist submission");
 
@@ -61,6 +62,8 @@ MODULE_PARM_DESC(max_vfs,
 #endif
 
 module_param_named_unsafe(wedged_mode, xe_modparam.wedged_mode, int, 0600);
+#endif /* __linux__ */
+
 MODULE_PARM_DESC(wedged_mode,
 		 "Module's default policy for the wedged mode - 0=never, 1=upon-critical-errors[default], 2=upon-any-hang");
 

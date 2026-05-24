@@ -103,7 +103,6 @@ SRCS=	\
 	xe_vram_freq.c \
 	xe_wait_user_fence.c \
 	xe_wa.c \
-	xe_wa_oob.c \
 	xe_wopcm.c
 
 # SR-IOV VF pieces are unconditionally included by Linux xe-y.
@@ -137,14 +136,6 @@ ${WA_H} ${WA_C}: ${WA_GEN} ${WA_RULES}
 	mkdir -p ${GENDIR}
 	${WA_GEN} ${WA_RULES} ${WA_C} ${WA_H}
 
-xe_wa_oob.c: ${WA_C}
-	cp ${WA_C} ${.TARGET}
-
-xe_wa_oob.h: ${WA_H}
-	cp ${WA_H} ${.TARGET}
-
-xe_wa_oob.o: xe_wa_oob.c xe_wa_oob.h
-
 .include <bsd.kmod.mk>
 
 .include "../linuxkpi_version.mk"
@@ -168,17 +159,31 @@ CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=xe_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 CFLAGS+= -DCONFIG_DRM_XE
+CFLAGS+= -DCONFIG_DRM_XE_FORCE_PROBE='"*"'
 
 CFLAGS+= -include linux/fault-inject.h
 CFLAGS+= -include linux/mmu_notifier.h
 CFLAGS+= -include linux/units.h
 CFLAGS+= -include linux/pci-p2pdma.h
+CFLAGS+= -include linux/pm.h
 CFLAGS+= -include linux/rwsem.h
 CFLAGS+= -include linux/bitfield.h
 CFLAGS+= -include linux/lockdep.h
 CFLAGS+= -include linux/string_helpers.h
 CFLAGS+= -include drm/drm_managed_compat.h
 CFLAGS+= -include linux/component.h
+CFLAGS+= -include linux/perf_event.h
+CFLAGS+= -include linux/uuid.h
+CFLAGS+= -include linux/mm.h
+CFLAGS+= -include linux/anon_inodes.h
+CFLAGS+= -include linux/idr.h
+CFLAGS+= -include linux/align.h
+CFLAGS+= -include linux/kunit.h
+CFLAGS+= -include linux/kthread.h
+CFLAGS+= -include linux/ioport.h
+CFLAGS+= -include linux/io.h
+CFLAGS+= -include linux/sizes.h
+CFLAGS+= -include linux/errno.h
 CFLAGS+= -include linux/bitmap.h
 CFLAGS+= -include linux/tracepoint.h
 

@@ -602,10 +602,14 @@ bool xe_pm_runtime_get_if_in_use(struct xe_device *xe)
 static bool xe_pm_suspending_or_resuming(struct xe_device *xe)
 {
 #ifdef CONFIG_PM
+#ifdef __linux__
 	struct device *dev = xe->drm.dev;
 
 	return dev->power.runtime_status == RPM_SUSPENDING ||
 		dev->power.runtime_status == RPM_RESUMING;
+#elif defined(__FreeBSD__)
+	return false;
+#endif
 #else
 	return false;
 #endif
@@ -664,10 +668,17 @@ void xe_pm_assert_unbounded_bridge(struct xe_device *xe)
 	if (!bridge)
 		return;
 
+#ifdef __linux__
 	if (!bridge->driver) {
 		drm_warn(&xe->drm, "unbounded parent pci bridge, device won't support any PM support.\n");
 		device_set_pm_not_required(&pdev->dev);
 	}
+#elif defined(__FreeBSD__)
+	/*
+	 * FreeBSD LinuxKPI struct pci_dev does not expose a driver pointer.
+	 * Leave bridge PM policy unchanged for now.
+	 */
+#endif
 }
 
 /**

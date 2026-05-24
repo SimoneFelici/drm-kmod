@@ -69,6 +69,7 @@ static __ktime_func_t __clock_id_to_func(clockid_t clk_id)
 	switch (clk_id) {
 	case CLOCK_MONOTONIC:
 		return &ktime_get_ns;
+#ifdef __linux__
 	case CLOCK_MONOTONIC_RAW:
 		return &ktime_get_raw_ns;
 	case CLOCK_REALTIME:
@@ -77,6 +78,14 @@ static __ktime_func_t __clock_id_to_func(clockid_t clk_id)
 		return &ktime_get_boottime_ns;
 	case CLOCK_TAI:
 		return &ktime_get_clocktai_ns;
+#elif defined(__FreeBSD__)
+	case CLOCK_REALTIME:
+		return &ktime_get_ns;
+#ifdef CLOCK_TAI
+	case CLOCK_TAI:
+		return &ktime_get_ns;
+#endif
+#endif
 	default:
 		return NULL;
 	}

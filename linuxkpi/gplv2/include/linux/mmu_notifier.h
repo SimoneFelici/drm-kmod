@@ -68,4 +68,23 @@ mmu_interval_read_retry(struct mmu_interval_notifier *mni, unsigned long seq)
 	return (false);
 }
 
+static inline bool
+mmu_interval_check_retry(struct mmu_interval_notifier *mni,
+    unsigned long seq)
+{
+	return mmu_interval_read_retry(mni, seq);
+}
+
+static inline bool
+mmu_notifier_range_blockable(const struct mmu_notifier_range *range)
+{
+	return (true);
+}
+
+static inline void
+mmu_interval_set_seq(struct mmu_interval_notifier *mni, unsigned long seq)
+{
+	mni->invalidate_seq = seq;
+}
+
 #endif /* _LINUX_MMU_NOTIFIER_H */

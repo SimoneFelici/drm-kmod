@@ -138,11 +138,15 @@ static int heci_gsc_add_device(struct xe_device *xe, const struct heci_gsc_def *
 	if (!adev)
 		return -ENOMEM;
 	adev->irq = heci_gsc->irq;
+#ifdef __linux__
 	adev->bar.parent = &pdev->resource[0];
 	adev->bar.start = def->bar + pdev->resource[0].start;
+	adev->bar.desc = IORES_DESC_NONE;
+#elif defined(__FreeBSD__)
+	adev->bar.start = def->bar + pci_resource_start(pdev, 0);
+#endif
 	adev->bar.end = adev->bar.start + def->bar_size - 1;
 	adev->bar.flags = IORESOURCE_MEM;
-	adev->bar.desc = IORES_DESC_NONE;
 	adev->slow_firmware = def->slow_firmware;
 
 	aux_dev = &adev->aux_dev;

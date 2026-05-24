@@ -30,10 +30,14 @@ _resize_bar(struct xe_device *xe, int resno, resource_size_t size)
 	int bar_size = pci_rebar_bytes_to_size(size);
 	int ret;
 
+#ifdef __linux__
 	if (pci_resource_len(pdev, resno))
 		pci_release_resource(pdev, resno);
 
 	ret = pci_resize_resource(pdev, resno, bar_size);
+#elif defined(__FreeBSD__)
+	ret = -ENODEV;
+#endif
 	if (ret) {
 		drm_info(&xe->drm, "Failed to resize BAR%d to %dM (%pe). Consider enabling 'Resizable BAR' support in your BIOS\n",
 			 resno, 1 << bar_size, ERR_PTR(ret));
@@ -96,12 +100,13 @@ static void resize_vram_bar(struct xe_device *xe)
 	drm_info(&xe->drm, "Attempting to resize bar from %lluMiB -> %lluMiB\n",
 		 (u64)current_size >> 20, (u64)rebar_size >> 20);
 
+#ifdef __linux__
 	while (root->parent)
 		root = root->parent;
 
 	pci_bus_for_each_resource(root, root_res, i) {
 		if (root_res && root_res->flags & (IORESOURCE_MEM | IORESOURCE_MEM_64) &&
-		    (u64)root_res->start > 0x100000000ul)
+		   (u64)root_res->start > 0x100000000ul)
 			break;
 	}
 
@@ -117,6 +122,10 @@ static void resize_vram_bar(struct xe_device *xe)
 
 	pci_assign_unassigned_bus_resources(pdev->bus);
 	pci_write_config_dword(pdev, PCI_COMMAND, pci_cmd);
+#elif defined(__FreeBSD__)
+	drm_info(&xe->drm, "Resizable BAR resizing is not supported by FreeBSD LinuxKPI yet\n");
+	return;
+#endif
 }
 
 static bool resource_is_valid(struct pci_dev *pdev, int bar)

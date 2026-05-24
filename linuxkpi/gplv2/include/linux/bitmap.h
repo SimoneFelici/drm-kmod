@@ -44,6 +44,20 @@ bitmap_set_value8(unsigned long *map, unsigned long value,
 	}
 }
 
+static inline bool
+bitmap_or_bit(const unsigned long *addr1, const unsigned long *addr2,
+    unsigned long nr)
+{
+	return (test_bit(nr, addr1) || test_bit(nr, addr2));
+}
+
+#ifndef for_each_or_bit
+#define for_each_or_bit(_bit, _addr1, _addr2, _size)			\
+	for ((_bit) = 0; (_bit) < (_size); (_bit)++)			\
+		if (!bitmap_or_bit((_addr1), (_addr2), (_bit))) {	\
+		} else
+#endif
+
 static inline unsigned long
 bitmap_next_bitrange_start(const unsigned long *bitmap, unsigned long start,
     unsigned long nbits, bool set)

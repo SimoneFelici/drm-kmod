@@ -133,7 +133,11 @@ static void xe_oa_config_release(struct kref *ref)
 
 	kfree(oa_config->regs);
 
+#ifdef __linux__
 	kfree_rcu(oa_config, rcu);
+#elif defined(__FreeBSD__)
+	kfree(oa_config);
+#endif
 }
 
 static void xe_oa_config_put(struct xe_oa_config *oa_config)
