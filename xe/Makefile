@@ -171,6 +171,16 @@ CFLAGS+= -DCONFIG_DRM_XE
 
 CFLAGS+= -include linux/fault-inject.h
 CFLAGS+= -include linux/mmu_notifier.h
+CFLAGS+= -include linux/units.h
+CFLAGS+= -include linux/pci-p2pdma.h
+CFLAGS+= -include linux/rwsem.h
+CFLAGS+= -include linux/bitfield.h
+CFLAGS+= -include linux/lockdep.h
+CFLAGS+= -include linux/string_helpers.h
+CFLAGS+= -include drm/drm_managed_compat.h
+CFLAGS+= -include linux/component.h
+CFLAGS+= -include linux/bitmap.h
+CFLAGS+= -include linux/tracepoint.h
 
 CWARNFLAGS+= -Wno-pointer-arith -Wno-format -Wno-cast-qual
 CWARNFLAGS+= -Wno-unused-function -Wno-unused-variable -Wno-unused-but-set-variable

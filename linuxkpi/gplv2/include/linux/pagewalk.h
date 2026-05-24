@@ -11,6 +11,7 @@ typedef struct { unsigned long pmd; } pmd_t;
 typedef struct { unsigned long pte; } pte_t;
 
 struct mm_walk;
+struct address_space;
 
 /* Locking requirement during a page walk. */
 enum page_walk_lock {

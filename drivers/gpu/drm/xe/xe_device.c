@@ -90,7 +90,11 @@ static int xe_file_open(struct drm_device *dev, struct drm_file *file)
 	file->driver_priv = xef;
 	kref_init(&xef->refcount);
 
+#ifdef __linux__
 	task = get_pid_task(rcu_access_pointer(file->pid), PIDTYPE_PID);
+#elif defined(__FreeBSD__)
+	task = get_pid_task(file->pid, PIDTYPE_PID);
+#endif
 	if (task) {
 		xef->process_name = kstrdup(task->comm, GFP_KERNEL);
 		xef->pid = task->pid;
@@ -310,8 +314,12 @@ struct xe_device *xe_device_create(struct pci_dev *pdev,
 		return xe;
 
 	err = ttm_device_init(&xe->ttm, &xe_ttm_funcs, xe->drm.dev,
-			      xe->drm.anon_inode->i_mapping,
-			      xe->drm.vma_offset_manager, false, false);
+#ifdef __linux__
+				     xe->drm.anon_inode->i_mapping,
+#elif defined(__FreeBSD__)
+				     NULL, /* Dummy on BSD */
+#endif
+				     xe->drm.vma_offset_manager, false, false);
 	if (WARN_ON(err))
 		goto err;
 
