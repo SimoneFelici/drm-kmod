@@ -37,22 +37,30 @@ string_get_size(u64 size, u64 blk_size, const enum string_size_units units,
 
 	if (units == STRING_UNITS_2) {
 		if (bytes >= (1ULL << 30))
-			snprintf(buf, len, "%llu GiB", bytes >> 30);
+			snprintf(buf, len, "%llu GiB",
+			    (unsigned long long)(bytes >> 30));
 		else if (bytes >= (1ULL << 20))
-			snprintf(buf, len, "%llu MiB", bytes >> 20);
+			snprintf(buf, len, "%llu MiB",
+			    (unsigned long long)(bytes >> 20));
 		else if (bytes >= (1ULL << 10))
-			snprintf(buf, len, "%llu KiB", bytes >> 10);
+			snprintf(buf, len, "%llu KiB",
+			    (unsigned long long)(bytes >> 10));
 		else
-			snprintf(buf, len, "%llu B", bytes);
+			snprintf(buf, len, "%llu B",
+			    (unsigned long long)bytes);
 	} else {
 		if (bytes >= 1000000000ULL)
-			snprintf(buf, len, "%llu GB", bytes / 1000000000ULL);
+			snprintf(buf, len, "%llu GB",
+			    (unsigned long long)(bytes / 1000000000ULL));
 		else if (bytes >= 1000000ULL)
-			snprintf(buf, len, "%llu MB", bytes / 1000000ULL);
+			snprintf(buf, len, "%llu MB",
+			    (unsigned long long)(bytes / 1000000ULL));
 		else if (bytes >= 1000ULL)
-			snprintf(buf, len, "%llu KB", bytes / 1000ULL);
+			snprintf(buf, len, "%llu KB",
+			    (unsigned long long)(bytes / 1000ULL));
 		else
-			snprintf(buf, len, "%llu B", bytes);
+			snprintf(buf, len, "%llu B",
+			    (unsigned long long)bytes);
 	}
 }
 
