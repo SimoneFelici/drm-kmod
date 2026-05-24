@@ -38,6 +38,44 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_managed.h>
 
+#if defined(__FreeBSD__)
+static vm_fault_t ttm_bo_vm_insert_iomem_pfn_locked(struct vm_area_struct *vma,
+			    unsigned long addr,
+			    unsigned long pfn,
+			    pgprot_t prot)
+{
+	vm_object_t vm_obj = vma->vm_obj;
+	vm_page_t page;
+	vm_pindex_t pindex;
+
+	VM_OBJECT_ASSERT_WLOCKED(vm_obj);
+
+	pindex = OFF_TO_IDX(addr - vma->vm_start);
+	if (vma->vm_pfn_count == 0)
+		vma->vm_pfn_first = pindex;
+
+	page = vm_page_grab(vm_obj, pindex, VM_ALLOC_NOCREAT);
+	if (page != NULL) {
+		vma->vm_pfn_count++;
+		return VM_FAULT_NOPAGE;
+	}
+
+	page = vm_page_getfake(IDX_TO_OFF(pfn), pgprot2cachemode(prot));
+	if (page == NULL)
+		return VM_FAULT_OOM;
+
+	if (vm_page_insert(page, vm_obj, pindex) != 0) {
+		vm_page_xunbusy(page);
+		vm_page_free(page);
+		return VM_FAULT_OOM;
+	}
+	vm_page_valid(page);
+	vma->vm_pfn_count++;
+
+	return VM_FAULT_NOPAGE;
+}
+#endif
+
 static vm_fault_t ttm_bo_vm_fault_idle(struct ttm_buffer_object *bo,
 				struct vm_fault *vmf)
 {
@@ -279,7 +317,10 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		 */
 		ret = vmf_insert_pfn_prot(vma, address, pfn, prot);
 #elif defined(__FreeBSD__)
-		ret = lkpi_vmf_insert_pfn_prot_locked(vma, address, pfn, prot);
+		if (bo->resource->bus.is_iomem)
+			ret = ttm_bo_vm_insert_iomem_pfn_locked(vma, address, pfn, prot);
+		else
+			ret = lkpi_vmf_insert_pfn_prot_locked(vma, address, pfn, prot);
 #endif
 
 		/* Never error on prefaulted PTEs */
