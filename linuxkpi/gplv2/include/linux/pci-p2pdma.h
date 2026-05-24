@@ -37,7 +37,13 @@ pci_dev_msi_enabled(struct pci_dev *pdev)
 static inline int
 pci_msix_vec_count(struct pci_dev *pdev)
 {
-	return (pci_msix_count(pdev->dev.bsddev));
+	int nvec;
+
+	nvec = pci_msix_count(pdev->dev.bsddev);
+	if (nvec <= 0)
+		return (-EINVAL);
+
+	return (nvec);
 }
 #endif
 

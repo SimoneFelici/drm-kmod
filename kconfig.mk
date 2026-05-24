@@ -93,3 +93,5 @@ KCONFIG+=	RISCV
 KCONFIG+=	64BIT
 .endif
 .endif
+# Render-only xe is the default on FreeBSD until the i915 display stack is ported.
+# Enable DRM_XE_DISPLAY only on a dedicated display/KMS branch.

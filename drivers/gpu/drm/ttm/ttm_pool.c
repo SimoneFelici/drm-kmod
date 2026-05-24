@@ -64,7 +64,9 @@ struct ttm_pool_dma {
 static unsigned long page_pool_size;
 
 MODULE_PARM_DESC(page_pool_size, "Number of pages in the WC/UC/DMA pool");
+#ifndef XE_EMBED_TTM
 module_param(page_pool_size, ulong, 0644);
+#endif
 
 static atomic_long_t allocated_pages;
 

@@ -3,6 +3,10 @@
  * Copyright © 2021 Intel Corporation
  */
 
+#ifdef __FreeBSD__
+#include <sys/systm.h>
+#endif
+
 #include "xe_pci.h"
 
 #include <kunit/static_stub.h>
@@ -759,6 +763,7 @@ static void xe_pci_remove(struct pci_dev *pdev)
 
 static int xe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 {
+	printf("xe: xe_pci_probe vendor=%04x device=%04x\\n", pdev->vendor, pdev->device);
 	const struct xe_device_desc *desc = (const void *)ent->driver_data;
 	const struct xe_subplatform_desc *subplatform_desc;
 	struct xe_device *xe;
@@ -1019,11 +1024,13 @@ static struct pci_driver xe_pci_driver = {
 
 int xe_register_pci_driver(void)
 {
+	printf("xe: xe_register_pci_driver()\n");
 	return pci_register_driver(&xe_pci_driver);
 }
 
 void xe_unregister_pci_driver(void)
 {
+	printf("xe: xe_unregister_pci_driver()\n");
 	pci_unregister_driver(&xe_pci_driver);
 }
 

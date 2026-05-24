@@ -1,5 +1,28 @@
 // SPDX-License-Identifier: MIT
 /*
+ * Copyright © 2023 Intel Corporation
+ */
+
+#include "xe_hmm.h"
+
+#include <linux/errno.h>
+
+#ifdef __FreeBSD__
+
+int xe_hmm_userptr_populate_range(struct xe_userptr_vma *uvma,
+				  bool is_mm_mmap_locked)
+{
+	return -ENOSYS;
+}
+
+void xe_hmm_userptr_free_sg(struct xe_userptr_vma *uvma)
+{
+}
+
+#else /* __FreeBSD__ */
+
+// SPDX-License-Identifier: MIT
+/*
  * Copyright © 2024 Intel Corporation
  */
 
@@ -251,3 +274,6 @@ free_pfns:
 	return ret;
 }
 
+
+
+#endif /* __FreeBSD__ */

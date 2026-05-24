@@ -172,6 +172,12 @@ static const struct file_operations wedged_mode_fops = {
 
 void xe_debugfs_register(struct xe_device *xe)
 {
+#ifdef __FreeBSD__
+	return;
+#endif
+#ifdef __FreeBSD__
+	return;
+#endif
 	struct ttm_device *bdev = &xe->ttm;
 	struct drm_minor *minor = xe->drm.primary;
 	struct dentry *root = minor->debugfs_root;

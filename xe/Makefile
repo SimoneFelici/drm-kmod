@@ -10,17 +10,24 @@ WA_H=	${GENDIR}/xe_wa_oob.h
 .PATH:	${SRCDIR} \
 	${SRCDIR}/regs \
 	${SRCDIR}/instructions \
+	${SRCDIR}/display \
 	${GENDIR}
 
+.PATH: ${.CURDIR:H}/drivers/gpu/drm/ttm
+.PATH: ${.CURDIR:H}/drivers/gpu/drm
+
 KMOD=	xe
+KMODDEPS=	dmabuf drm ttm
 
 EXPORT_SYMS=	YES
 
 SRCS=	\
+	xe_freebsd_stubs.c \
 	xe_bb.c \
 	xe_bo.c \
 	xe_bo_evict.c \
 	xe_devcoredump.c \
+	xe_debugfs.c \
 	xe_device.c \
 	xe_device_sysfs.c \
 	xe_dma_buf.c \
@@ -36,6 +43,8 @@ SRCS=	\
 	xe_gsc_proxy.c \
 	xe_gsc_submit.c \
 	xe_gt.c \
+	xe_gt_stats.c \
+	xe_gt_debugfs.c \
 	xe_gt_ccs_mode.c \
 	xe_gt_clock.c \
 	xe_gt_freq.c \
@@ -47,6 +56,7 @@ SRCS=	\
 	xe_gt_tlb_invalidation.c \
 	xe_gt_topology.c \
 	xe_guc.c \
+	xe_guc_debugfs.c \
 	xe_guc_ads.c \
 	xe_guc_ct.c \
 	xe_guc_db_mgr.c \
@@ -62,6 +72,8 @@ SRCS=	\
 	xe_hw_engine_group.c \
 	xe_hw_fence.c \
 	xe_huc.c \
+	xe_huc_debugfs.c \
+	xe_hmm.c \
 	xe_irq.c \
 	xe_lrc.c \
 	xe_migrate.c \
@@ -97,6 +109,7 @@ SRCS=	\
 	xe_ttm_vram_mgr.c \
 	xe_tuning.c \
 	xe_uc.c \
+	xe_uc_debugfs.c \
 	xe_uc_fw.c \
 	xe_vm.c \
 	xe_vram.c \
@@ -105,12 +118,34 @@ SRCS=	\
 	xe_wa.c \
 	xe_wopcm.c
 
+.if ${KCONFIG:MDRM_XE_DISPLAY} != ""
+SRCS+=	xe_display.c
+.endif
+
 # SR-IOV VF pieces are unconditionally included by Linux xe-y.
 SRCS+=	\
 	xe_gt_sriov_vf.c \
+	xe_gt_sriov_vf_debugfs.c \
 	xe_guc_relay.c \
 	xe_memirq.c \
 	xe_sriov.c
+
+
+# Temporary: link TTM directly into xe.ko until KLD symbol export/dependency is fixed.
+CFLAGS+= -DXE_EMBED_TTM
+SRCS+= \
+	ttm_bo.c \
+	ttm_bo_util.c \
+	ttm_bo_vm.c \
+	ttm_execbuf_util.c \
+	ttm_module.c \
+	ttm_pool.c \
+	ttm_device.c \
+	ttm_sys_manager.c \
+	ttm_range_manager.c \
+	ttm_resource.c \
+	ttm_tt.c \
+	drm_gem_ttm_helper.c
 
 SRCS+=	\
 	opt_acpi.h \
@@ -151,6 +186,8 @@ CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= -I${SRCDIR}
+CFLAGS+= -I${SRCDIR}/compat-i915-headers
+CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/regs
 CFLAGS+= -I${SRCDIR}/instructions
 CFLAGS+= -I${.CURDIR}
@@ -193,3 +230,5 @@ CWARNFLAGS+= -Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS+= -Wno-incompatible-function-pointer-types
 CWARNFLAGS+= -Wno-initializer-overrides
 CWARNFLAGS+= -Wno-constant-logical-operand
+
+CWARNFLAGS+= -Wno-macro-redefined

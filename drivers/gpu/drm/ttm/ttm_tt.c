@@ -51,12 +51,16 @@
 static unsigned long ttm_pages_limit;
 
 MODULE_PARM_DESC(pages_limit, "Limit for the allocated pages");
+#ifndef XE_EMBED_TTM
 module_param_named(pages_limit, ttm_pages_limit, ulong, 0644);
+#endif
 
 static unsigned long ttm_dma32_pages_limit;
 
 MODULE_PARM_DESC(dma32_pages_limit, "Limit for the allocated DMA32 pages");
+#ifndef XE_EMBED_TTM
 module_param_named(dma32_pages_limit, ttm_dma32_pages_limit, ulong, 0644);
+#endif
 
 static atomic_long_t ttm_pages_allocated;
 static atomic_long_t ttm_dma32_pages_allocated;
