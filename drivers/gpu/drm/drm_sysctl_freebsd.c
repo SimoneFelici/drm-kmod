@@ -68,6 +68,15 @@ struct drm_sysctl_info {
 	char		       name[2];
 };
 
+static bool
+drm_sysctl_exists(const char *name)
+{
+	size_t len = 0;
+
+	return (kernel_sysctlbyname(curthread, __DECONST(char *, name), NULL,
+	    &len, NULL, 0, NULL, 0) == 0);
+}
+
 int
 drm_sysctl_init(struct drm_device *dev)
 {
@@ -131,8 +140,10 @@ drm_sysctl_init(struct drm_device *dev)
 			return (-ENOMEM);
 		}
 	}
-	SYSCTL_ADD_LONG(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO, "debug",
-	    CTLFLAG_RW, &__drm_debug, "Enable debugging output");
+	if (!drm_sysctl_exists("hw.dri.debug"))
+		SYSCTL_ADD_LONG(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
+		    "debug", CTLFLAG_RW, &__drm_debug,
+		    "Enable debugging output");
 #ifdef notyet
 	if (dev->driver->sysctl_init != NULL)
 		dev->driver->sysctl_init(dev, &info->ctx, top);
@@ -140,14 +151,14 @@ drm_sysctl_init(struct drm_device *dev)
 
 	drm_add_busid_modesetting(dev, &info->ctx, top);
 
-	SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
-	    "vblank_offdelay", CTLFLAG_RW, &drm_vblank_offdelay,
-	    sizeof(drm_vblank_offdelay),
-	    "");
-	SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
-	    "timestamp_precision", CTLFLAG_RW, &drm_timestamp_precision,
-	    sizeof(drm_timestamp_precision),
-	    "");
+	if (!drm_sysctl_exists("hw.dri.vblank_offdelay"))
+		SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
+		    "vblank_offdelay", CTLFLAG_RW, &drm_vblank_offdelay,
+		    sizeof(drm_vblank_offdelay), "");
+	if (!drm_sysctl_exists("hw.dri.timestamp_precision"))
+		SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
+		    "timestamp_precision", CTLFLAG_RW, &drm_timestamp_precision,
+		    sizeof(drm_timestamp_precision), "");
 
 	return (0);
 }
