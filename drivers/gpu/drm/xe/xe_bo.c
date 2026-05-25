@@ -321,8 +321,16 @@ static void xe_tt_unmap_sg(struct ttm_tt *tt)
 	struct xe_ttm_tt *xe_tt = container_of(tt, struct xe_ttm_tt, ttm);
 
 	if (xe_tt->sg) {
-		dma_unmap_sgtable(xe_tt->dev, xe_tt->sg,
-				  DMA_BIDIRECTIONAL, 0);
+#ifdef __FreeBSD__
+		/*
+		 * LinuxKPI tears down the DMA backend during PCI detach. User
+		 * mappings can still close after that, so avoid dereferencing the
+		 * freed DMA state while releasing the remaining TTM objects.
+		 */
+		if (xe_tt->dev->dma_priv)
+#endif
+			dma_unmap_sgtable(xe_tt->dev, xe_tt->sg,
+					  DMA_BIDIRECTIONAL, 0);
 		sg_free_table(xe_tt->sg);
 		xe_tt->sg = NULL;
 	}
