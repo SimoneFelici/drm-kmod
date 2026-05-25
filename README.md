@@ -1,6 +1,8 @@
 # drm-kmod
 
-The DRM drivers ported from Linux to FreeBSD using *linuxkpi*.
+The DRM drivers ported from Linux to FreeBSD using *linuxkpi*. This tree
+includes the Intel xe driver for recent Intel Xe GPUs, including Battlemage
+devices that use the xe DRM driver on Linux.
 
 ## Installing from sources
 
@@ -56,6 +58,18 @@ by the DRM drivers when needed.
 
 The kernel modules can be compiled by following the same instructions as the
 DRM drivers. The same constraint applies: use the matching kernel sources.
+
+For Intel xe hardware, install the corresponding GuC, HuC, and DMC firmware
+modules before loading the driver. The xe module can be built and installed on
+its own with:
+
+```sh
+make KMODS=xe DEBUG_FLAGS=-g SYSDIR=/usr/src/sys
+sudo make KMODS=xe install DEBUG_FLAGS=-g SYSDIR=/usr/src/sys KMODDIR=/boot/modules
+```
+
+Load the driver manually with `kldload xe`, or add `xe` to `kld_list` in
+rc.conf(5).
 
 ## Contributing
 
