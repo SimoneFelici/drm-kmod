@@ -245,8 +245,10 @@ dma_buf_export_sync_file(struct dma_buf *db, void *data)
 	sync_file = sync_file_create(fence);
 	dma_fence_put(fence);
 
-	if (sync_file == NULL)
+	if (sync_file == NULL) {
+		put_unused_fd(fd);
 		return (ENOMEM);
+	}
 
 	arg->fd = fd;
 

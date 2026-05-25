@@ -232,21 +232,6 @@ SRCS+=	\
 	xe_sriov.c
 
 
-# Temporary: link TTM directly into xe.ko until KLD symbol export/dependency is fixed.
-CFLAGS+= -DXE_EMBED_TTM
-SRCS+= \
-	ttm_bo.c \
-	ttm_bo_util.c \
-	ttm_bo_vm.c \
-	ttm_execbuf_util.c \
-	ttm_module.c \
-	ttm_pool.c \
-	ttm_device.c \
-	ttm_sys_manager.c \
-	ttm_range_manager.c \
-	ttm_resource.c \
-	ttm_tt.c \
-	drm_gem_ttm_helper.c
 
 SRCS+=	\
 	opt_acpi.h \
