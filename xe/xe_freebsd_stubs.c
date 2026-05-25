@@ -5,6 +5,7 @@
  */
 
 #include <sys/sysctl.h>
+#include <sys/module.h>
 
 #include <linux/ioport.h>
 
@@ -19,3 +20,9 @@ SYSCTL_NODE(_hw, OID_AUTO, xe,
  * currently does not populate stolen memory, so leave it empty.
  */
 struct resource intel_graphics_stolen_res = { 0 };
+#ifdef __FreeBSD__
+MODULE_DEPEND(xe, dmabuf, 1, 1, 1);
+MODULE_DEPEND(xe, drmn, 2, 2, 2);
+MODULE_DEPEND(xe, lindebugfs, 1, 1, 1);
+MODULE_DEPEND(xe, ttm, 1, 1, 1);
+#endif
