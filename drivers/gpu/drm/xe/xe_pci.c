@@ -1004,7 +1004,11 @@ static const struct dev_pm_ops xe_pm_ops = {
 #endif
 
 static struct pci_driver xe_pci_driver = {
+#ifdef __linux__
 	.name = DRIVER_NAME,
+#elif defined(__FreeBSD__)
+	.name = "drmn",	/* LinuxKPI expects this name to enable drm support */
+#endif
 	.id_table = pciidlist,
 	.probe = xe_pci_probe,
 	.remove = xe_pci_remove,
