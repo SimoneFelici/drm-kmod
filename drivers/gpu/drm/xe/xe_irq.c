@@ -682,6 +682,7 @@ static void irq_uninstall(void *arg)
 
 	irq = pci_irq_vector(pdev, 0);
 	free_irq(irq, xe);
+	pci_free_irq_vectors(pdev);
 }
 
 int xe_irq_install(struct xe_device *xe)
@@ -736,6 +737,7 @@ int xe_irq_install(struct xe_device *xe)
 
 free_irq_handler:
 	free_irq(irq, xe);
+	pci_free_irq_vectors(pdev);
 
 	return err;
 }
