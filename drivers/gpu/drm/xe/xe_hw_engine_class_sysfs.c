@@ -629,6 +629,10 @@ static void hw_engine_class_sysfs_fini(void *arg)
  */
 int xe_hw_engine_class_sysfs_init(struct xe_gt *gt)
 {
+#ifdef __FreeBSD__
+	return 0;
+#else
+
 	struct xe_device *xe = gt_to_xe(gt);
 	struct xe_hw_engine *hwe;
 	enum xe_hw_engine_id id;
@@ -685,4 +689,5 @@ int xe_hw_engine_class_sysfs_init(struct xe_gt *gt)
 err_object:
 	kobject_put(kobj);
 	return err;
+#endif
 }

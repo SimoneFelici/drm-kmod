@@ -224,10 +224,6 @@ int xe_gt_idle_init(struct xe_gt_idle *gtidle)
 	if (IS_SRIOV_VF(xe))
 		return 0;
 
-	kobj = kobject_create_and_add("gtidle", gt->sysfs);
-	if (!kobj)
-		return -ENOMEM;
-
 	if (xe_gt_is_media_type(gt)) {
 		snprintf(gtidle->name, sizeof(gtidle->name), "gt%d-mc", gt->info.id);
 		gtidle->idle_residency = xe_guc_pc_mc6_residency;
@@ -239,6 +235,15 @@ int xe_gt_idle_init(struct xe_gt_idle *gtidle)
 	/* Multiplier for Residency counter in units of 1.28us */
 	gtidle->residency_multiplier = 1280;
 	gtidle->idle_status = xe_guc_pc_c_status;
+
+#ifdef __FreeBSD__
+	xe_gt_idle_enable_pg(gt);
+	return 0;
+#endif
+
+	kobj = kobject_create_and_add("gtidle", gt->sysfs);
+	if (!kobj)
+		return -ENOMEM;
 
 	err = sysfs_create_files(kobj, gt_idle_attrs);
 	if (err) {

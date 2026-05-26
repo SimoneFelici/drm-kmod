@@ -188,6 +188,10 @@ static void xe_gt_ccs_mode_sysfs_fini(void *arg)
  */
 int xe_gt_ccs_mode_sysfs_init(struct xe_gt *gt)
 {
+#ifdef __FreeBSD__
+	return 0;
+#else
+
 	struct xe_device *xe = gt_to_xe(gt);
 	int err;
 
@@ -199,4 +203,5 @@ int xe_gt_ccs_mode_sysfs_init(struct xe_gt *gt)
 		return err;
 
 	return devm_add_action_or_reset(xe->drm.dev, xe_gt_ccs_mode_sysfs_fini, gt);
+#endif
 }

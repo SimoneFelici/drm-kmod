@@ -233,6 +233,10 @@ int xe_gt_freq_init(struct xe_gt *gt)
 	if (xe->info.skip_guc_pc)
 		return 0;
 
+#ifdef __FreeBSD__
+	return 0;
+#endif
+
 	gt->freq = kobject_create_and_add("freq0", gt->sysfs);
 	if (!gt->freq)
 		return -ENOMEM;
