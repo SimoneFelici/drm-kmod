@@ -4,6 +4,70 @@ The DRM drivers ported from Linux to FreeBSD using *linuxkpi*. This tree
 includes the Intel xe driver for recent Intel Xe GPUs, including Battlemage
 devices that use the xe DRM driver on Linux.
 
+## Intel Arc B580 / xe branch
+
+This fork carries experimental Intel xe support for Intel Arc B580
+(`8086:e20b`) on FreeBSD 15.1-RC1. Use the `xe-b580-display-clean` branch of
+this repository together with the `bmg-dmc-firmware` branch of
+https://github.com/SimoneFelici/drm-kmod-firmware.
+
+Clone both repositories explicitly from those branches:
+
+```sh
+git clone -b bmg-dmc-firmware https://github.com/SimoneFelici/drm-kmod-firmware.git
+git clone -b xe-b580-display-clean https://github.com/SimoneFelici/drm-kmod.git
+```
+
+Install the firmware first. The Battlemage DMC firmware is built by the
+firmware repository. The xe GuC and HuC firmware files are loaded as raw
+firmware files from `/boot/firmware/xe`:
+
+```sh
+cd drm-kmod-firmware
+make KMODS=i915kmsfw I915KMODS=battlemage DEBUG_FLAGS=-g SYSDIR=/usr/src/sys
+sudo make KMODS=i915kmsfw I915KMODS=battlemage install DEBUG_FLAGS=-g \
+    SYSDIR=/usr/src/sys KMODDIR=/boot/modules
+
+sudo install -d -m 755 /boot/firmware/xe
+sudo fetch -o /boot/firmware/xe/bmg_guc_70.bin \
+    https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/xe/bmg_guc_70.bin
+sudo fetch -o /boot/firmware/xe/bmg_huc.bin \
+    https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/xe/bmg_huc.bin
+```
+
+Then build and install only the xe driver:
+
+```sh
+cd ../drm-kmod
+make KMODS=xe DEBUG_FLAGS=-g SYSDIR=/usr/src/sys
+sudo make KMODS=xe install DEBUG_FLAGS=-g SYSDIR=/usr/src/sys KMODDIR=/boot/modules
+```
+
+Load the driver manually for testing:
+
+```sh
+sudo kldload dmabuf
+sudo kldload drm
+sudo kldload xe
+```
+
+For boot-time loading, add the modules to rc.conf(5):
+
+```sh
+sudo sysrc kld_list+="dmabuf drm xe"
+```
+
+After loading xe, the system should expose `/dev/dri/card0` and
+`/dev/dri/renderD128`. A basic KMS check is:
+
+```sh
+drm_info /dev/dri/card0
+dmesg | egrep 'bmg_guc|bmg_huc|bmg_dmc|Initialized xe'
+```
+
+The kernel driver and firmware are separate from Mesa userland support. If
+Mesa does not recognize `8086:e20b`, update Mesa separately.
+
 ## Installing from sources
 
 ### Requirements
