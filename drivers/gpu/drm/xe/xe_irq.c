@@ -668,9 +668,20 @@ static irq_handler_t xe_irq_handler(struct xe_device *xe)
 		return xelp_irq_handler;
 }
 
-static void irq_uninstall(void *arg)
+#ifdef __FreeBSD__
+static void xe_pci_free_irq_vectors(struct pci_dev *pdev)
 {
-	struct xe_device *xe = arg;
+	if (pdev->msix_enabled)
+		pci_disable_msix(pdev);
+	else
+		pci_free_irq_vectors(pdev);
+}
+#else
+#define xe_pci_free_irq_vectors(pdev) pci_free_irq_vectors(pdev)
+#endif
+
+void xe_irq_uninstall(struct xe_device *xe)
+{
 	struct pci_dev *pdev = to_pci_dev(xe->drm.dev);
 	int irq;
 
@@ -682,8 +693,15 @@ static void irq_uninstall(void *arg)
 
 	irq = pci_irq_vector(pdev, 0);
 	free_irq(irq, xe);
-	pci_free_irq_vectors(pdev);
+	xe_pci_free_irq_vectors(pdev);
 }
+
+#ifndef __FreeBSD__
+static void irq_uninstall(void *arg)
+{
+	xe_irq_uninstall(arg);
+}
+#endif
 
 int xe_irq_install(struct xe_device *xe)
 {
@@ -722,22 +740,29 @@ int xe_irq_install(struct xe_device *xe)
 	err = request_irq(irq, irq_handler, IRQF_SHARED, DRIVER_NAME, xe);
 	if (err < 0) {
 		drm_err(&xe->drm, "Failed to request MSI/MSIX IRQ %d\n", err);
-		return err;
+		goto free_irq_vectors;
 	}
 
 	xe->irq.enabled = true;
 
 	xe_irq_postinstall(xe);
 
+#ifdef __FreeBSD__
+	return 0;
+#else
 	err = devm_add_action_or_reset(xe->drm.dev, irq_uninstall, xe);
 	if (err)
 		goto free_irq_handler;
 
 	return 0;
+#endif
 
+#ifndef __FreeBSD__
 free_irq_handler:
 	free_irq(irq, xe);
-	pci_free_irq_vectors(pdev);
+#endif
+free_irq_vectors:
+	xe_pci_free_irq_vectors(pdev);
 
 	return err;
 }

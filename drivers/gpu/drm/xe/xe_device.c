@@ -764,6 +764,9 @@ err_fini_gt:
 	}
 
 err:
+#ifdef __FreeBSD__
+	xe_irq_uninstall(xe);
+#endif
 	xe_display_fini(xe);
 	return err;
 }
@@ -793,6 +796,10 @@ void xe_device_remove(struct xe_device *xe)
 
 	for_each_gt(gt, xe, id)
 		xe_gt_remove(gt);
+#ifdef __FreeBSD__
+	xe_irq_uninstall(xe);
+	xe_driver_flr(xe);
+#endif
 }
 
 void xe_device_shutdown(struct xe_device *xe)

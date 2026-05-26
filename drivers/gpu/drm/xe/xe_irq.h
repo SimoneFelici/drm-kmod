@@ -13,6 +13,7 @@ struct xe_gt;
 int xe_irq_install(struct xe_device *xe);
 void xe_irq_suspend(struct xe_device *xe);
 void xe_irq_resume(struct xe_device *xe);
+void xe_irq_uninstall(struct xe_device *xe);
 void xe_irq_enable_hwe(struct xe_gt *gt);
 
 #endif
